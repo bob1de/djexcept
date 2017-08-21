@@ -1,8 +1,9 @@
 try:
-    import django.conf
-    assert django.conf.settings.configured
+    from django.conf import settings as _django_settings
+    assert _django_settings.configured
 except (ImportError, AssertionError):
-    # django is not available, hence no functionality is provided.
+    # django is not available or still unconfigured, hence no
+    # functionality is provided.
     pass
 else:
     from .registration import (
@@ -10,4 +11,4 @@ else:
         )
 
 
-__version__ = "0.1.0"
+__version__ = "0.1.1"

@@ -21,7 +21,7 @@ setup(
     author = "Robert Schindler",
     author_email = "r.schindler@efficiosoft.com",
     packages = ["djexcept"],
-    install_requires = ["django >= 1.10"],
+    install_requires = ["django"],
     classifiers = [
         'Development Status :: 5 - Production/Stable',
         'Framework :: Django',
