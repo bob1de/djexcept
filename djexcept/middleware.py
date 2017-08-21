@@ -1,5 +1,9 @@
 from django.conf import settings
-from django.utils.deprecation import MiddlewareMixin
+try:
+    from django.utils.deprecation import MiddlewareMixin
+except ImportError:
+    # pre django 1.10 style middleware
+    MiddlewareMixin = object
 
 from .config import config
 from .registration import _get_exception_handler_attrs
