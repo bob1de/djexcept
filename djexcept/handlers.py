@@ -6,16 +6,8 @@ def handle_exception(request, exc, template_name=None, status=None,
     """
     This is djexcept's default exception handler.
 
-    It accepts the following optional keyword arguments:
-        * template_name: name of the template to use
-        * status: HTTP status code
-        * include_request: whether to include the request in template
-          context
-        * context: dictionary of which a copy is used as starting point
-          for the template context; values in that context won't be
-          overwritten
-
-    A django.template.response.SimpleTemplateResponse is returned.
+    A django.template.response.SimpleTemplateResponse or
+    django.template.response.TemplateResponse is returned.
     """
 
     # initialize context if needed and shallow-copy it afterwards

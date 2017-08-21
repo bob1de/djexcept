@@ -148,11 +148,13 @@ as long as it follows some guidelines.
 
 An exception handler has to be a callable that accepts as positional
 arguments the request, the exception object and at least the keyword
-arguments listed in the previous section, because these will, even if
-unspecified at time of registration, always be filled with default
-values. It must return a ``django.http.response.HttpResponse`` object.
+arguments listed in the previous section, because these, if unspecified
+at time of registration, will be filled with default values. It must
+return a ``django.http.response.HttpResponse`` object or ``None``, in
+which case the exception isn't handled by djexcept and Django's regular
+exception handling kicks in.
 
-If your custom handler doesn't care about some of these keyword
+If your custom handler doesn't care about some of the mandatory keyword
 arguments, you could insert a ``**kwargs`` at the end of its argument
 list to catch any extra keyword arguments and have it working even when
 new ones are added to djexcept in the future.
@@ -277,6 +279,17 @@ Checks whether the given exception class is handled by djexcept. If
 ``DJEXCEPT_HANDLE_SUBCLASSES`` setting is disabled and not overwritten
 at registration stage, this function returns the same result as
 ``djexcept.is_registered()``.
+
+Exceptions
+~~~~~~~~~~
+
+``djexcept.handler.handle_exception(request, exc, template_name=None, status=None, include_request=None, context=None)``
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+This is djexcept's default exception handler.
+
+A ``django.template.response.SimpleTemplateResponse`` or
+``django.template.response.TemplateResponse`` is returned.
 
 Exceptions
 ~~~~~~~~~~
