@@ -205,15 +205,15 @@ Default HTTP status code for exception pages.
 (default: ``djexcept.handlers.handle_exception``)
 
 Default exception handler. Please specify it as a string of the form
-"path.to.module.function", as known from Django's ``MIDDLEWARE`` list.
+``path.to.module.function``, as known from Django's ``MIDDLEWARE`` list.
 
 ``DJEXCEPT_HANDLE_SUBCLASSES``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 (default: ``True``)
 
-Whether to treat subclasses of registered exception types in the same
-way as their ancestor.
+Whether to treat **unregistered** subclasses of registered exception
+types in the same way as their ancestor.
 
 ``DJEXCEPT_INCLUDE_REQUEST``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -229,7 +229,7 @@ Whether to include the ``request`` object into the template context.
 
 Whether to disable djexcept's exception handling when Django's debug
 mode is enabled. You might find this useful to see full tracebacks
-instead of your custom exception pages.
+instead of your custom exception pages while developing your project.
 
 API reference
 -------------
@@ -248,7 +248,7 @@ an exception handler to overwrite the default one \*
 ``DJEXCEPT_HANDLE_SUBCLASSES`` setting on a per exception basis
 
 All other keyword arguments are passed directly to the handler function
-when there is an exception to handle. See below for their meanings.
+when there is an exception to handle.
 
 This function may also be used as a class decorator when defining custom
 exceptions.
