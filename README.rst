@@ -93,10 +93,10 @@ following parameters may be passed to ``djexcept.register()`` as keyword
 arguments:
 
 -  ``handler``: exception handler (callable or string of type
-   "path.to.module.function")
--  ``handle_subclasses``: boolean that controls whether subclasses of
-   the exception class being registered should be handled in the same
-   way as their ancestor
+   ``path.to.module.function``)
+-  ``handle_subclasses``: boolean that controls whether **unregistered**
+   subclasses of the exception class being registered should be handled
+   in the same way as their ancestor
 
 All other keyword arguments are passed through straight to the exception
 handler. The following are those that the built-in exception handler
@@ -112,7 +112,7 @@ understands:
 
 If some of these keyword arguments are not specified, default values for
 them will automatically be inserted according to the ``DJEXCEPT_*``
-settings (see below).
+settings (see below) before the handler is called.
 
 It is at the sole discretion of the chosen exception handler to
 interpret these keyword arguments as desired.
@@ -236,8 +236,11 @@ instead of your custom exception pages while developing your project.
 API reference
 -------------
 
-Exception registration
-~~~~~~~~~~~~~~~~~~~~~~
+Registration
+~~~~~~~~~~~~
+
+The public API methods of the ``djexcept.registration`` submodule are
+also directly available in ``djexcept`` for convenience.
 
 ``djexcept.register(exception_class, **attrs)``
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -280,8 +283,8 @@ Checks whether the given exception class is handled by djexcept. If
 at registration stage, this function returns the same result as
 ``djexcept.is_registered()``.
 
-Exceptions
-~~~~~~~~~~
+Handlers
+~~~~~~~~
 
 ``djexcept.handler.handle_exception(request, exc, template_name=None, status=None, include_request=None, context=None)``
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^

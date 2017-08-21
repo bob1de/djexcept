@@ -6,7 +6,7 @@ except (ImportError, AssertionError):
     pass
 else:
     from .registration import (
-            register, unregister, is_registered
+            register, unregister, is_registered, is_handled
         )
 
 
