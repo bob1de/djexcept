@@ -15,8 +15,8 @@ def register(exc_cls=None, **attrs):
     The additional keyword arguments are treated as follows:
         * handler: an exception handler to ovewrite the
           DJEXCEPT_EXCEPTION_HANDLER setting
-        * handle_subclasses: may be used to overwrite the
-          DJEXCEPT_HANDLE_SUBCLASSES setting on a per exception basis
+        * handle_subtypes: may be used to overwrite the
+          DJEXCEPT_HANDLE_SUBTYPES setting on a per exception basis
 
     All other keyword arguments are passed directly to the handler
     function when there is an exception to handle. See documentation
@@ -72,14 +72,14 @@ def is_registered(exc_cls):
 def is_handled(exc_cls):
     """
     Checks whether the given exception class is handled by djexcept.
-    If DJEXCEPT_HANDLE_SUBCLASSES setting is disabled and not overwritten
+    If DJEXCEPT_HANDLE_SUBTYPES setting is disabled and not overwritten
     at registration stage, this function returns the same result as
     djexcept.is_registered().
     """
 
     for cls, attrs in _registered_exception_classes.items():
         # require exact match if include_subclasses is disabled
-        if not attrs.get("handle_subclasses", config.handle_subclasses) \
+        if not attrs.get("handle_subtypes", config.handle_subtypes) \
            and cls is not exc_cls:
             continue
         if issubclass(exc_cls, cls):
@@ -90,7 +90,7 @@ def is_handled(exc_cls):
 def _get_best_exception_class_match(exc_cls):
     """
     Searches the closest registered ancestor of the given exception
-    class and returns it or None, if none exists. handle_subclasses
+    class and returns it or None, if none exists. handle_subtypes
     attributes are considered.
     """
 
@@ -98,7 +98,7 @@ def _get_best_exception_class_match(exc_cls):
     best = None
     for cls, attrs in _registered_exception_classes.items():
         # require exact match if include_subclasses is disabled
-        if not attrs.get("handle_subclasses", config.handle_subclasses) and \
+        if not attrs.get("handle_subtypes", config.handle_subtypes) and \
            cls is not exc_cls:
             continue
         if cls in mro:
@@ -113,7 +113,7 @@ def _get_exception_handler_attrs(exc_cls, exact=False):
     Return the attributes provided when the given class was registered
     or None, if it isn't registered at all.
 
-    If exact is set to True, all settings of handle_subclasses are ignored
+    If exact is set to True, all settings of handle_subtypes are ignored
     and only an exact match in the registration database will be
     considered valid.
     """

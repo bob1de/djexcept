@@ -13,8 +13,8 @@ class Config:
     """
 
     def __init__(self):
-        self.handle_subclasses = getattr(
-                settings, "DJEXCEPT_HANDLE_SUBCLASSES", True)
+        self.handle_subtypes = getattr(
+                settings, "DJEXCEPT_HANDLE_SUBTYPES", True)
         self.disable_on_debug = getattr(
                 settings, "DJEXCEPT_DISABLE_ON_DEBUG", False)
 

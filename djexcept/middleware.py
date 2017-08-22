@@ -36,7 +36,7 @@ class ExceptionHandlingMiddleware(MiddlewareMixin):
         handler_kwargs.update(handler_attrs)
 
         # remove reserved attributes from kwargs
-        for key in ("handler", "handle_subclasses",):
+        for key in ("handler", "handle_subtypes",):
             try:
                 del handler_kwargs[key]
             except KeyError:

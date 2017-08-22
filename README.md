@@ -91,7 +91,7 @@ arguments:
 
 * ``handler``: exception handler (callable or string of type
   ``path.to.module.function``)
-* ``handle_subclasses``: boolean that controls whether **unregistered**
+* ``handle_subtypes``: boolean that controls whether **unregistered**
   subclasses of the exception class being registered should be handled in
   the same way as their ancestor
 
@@ -145,9 +145,9 @@ An exception handler has to be a callable that accepts as positional
 arguments the request, the exception object and at least the keyword
 arguments listed in the previous section, because these, if unspecified
 at time of registration, will be filled with default values. It must
-return a ``django.http.response.HttpResponse`` object or ``None``, in
-which case the exception isn't handled by djexcept and Django's regular
-exception handling kicks in.
+return either a ``django.http.response.HttpResponse`` object or ``None``,
+in which case the exception isn't handled by djexcept and Django's
+regular exception handling sets in.
 
 If your custom handler doesn't care about some of the mandatory keyword
 arguments, you could insert a ``**kwargs`` at the end of its argument
@@ -174,6 +174,48 @@ def my_exception_handler(request, exc, context=None, **kwargs):
     context.setdefault("time", time.ctime())
     return handle_exception(request, exc, context=context, **kwargs)
 ```
+
+
+### Handling child exception types
+
+djexcept has the ability to automatically handle any sub-type
+of a registered exception type in the same way as their
+registered ancestor. This behaviour is controlled by the
+``DJEXCEPT_HANDLE_SUBTYPES`` setting and is enabled by default.
+
+ In practice, that allows you to write your own hirarchy of meaningful
+ exception types that you can use within your view logic. Consider the
+ following example:
+
+```
+import djexcept
+
+@djexcept.register(template_name="exceptions/business_logic_violation.html")
+class BusinessRuleViolation(Exception):
+    pass
+
+class NegativeAccountBalance(BusinessRuleViolation):
+    pass
+
+class OfferExpired(BusinessRuleViolation):
+    pass
+```
+
+Using this example, raising either ``NegativeAccountBalance`` or
+``OfferExpired`` will be handled as it was a ``BusinessRuleViolation``,
+what it in fact is.
+
+In theory, you could even catch all possible sub-types of ``Exception``,
+however doing so is not recommended because it will hide potential bugs
+that might occur at runtime:
+
+```
+import djexcept
+djexcept.register(Exception)
+```
+
+Sub-type handling can also be disabled per type by passing
+``handle_subtypes = False`` to ``djexcept.register()``.
 
 
 
@@ -203,7 +245,7 @@ Default exception handler. Please specify it as a string of the form
 ``path.to.module.function``, as known from Django's ``MIDDLEWARE`` list.
 
 
-### ``DJEXCEPT_HANDLE_SUBCLASSES``
+### ``DJEXCEPT_HANDLE_SUBTYPES``
 (default: ``True``)
 
 Whether to treat **unregistered** subclasses of registered exception
@@ -239,8 +281,8 @@ djexcept.
 
 The additional keyword arguments are treated as follows:
 * ``handler``: an exception handler to overwrite the default one
-* ``handle_subclasses``: may be used to overwrite the
-  ``DJEXCEPT_HANDLE_SUBCLASSES`` setting on a per exception basis
+* ``handle_subtypes``: may be used to overwrite the
+  ``DJEXCEPT_HANDLE_SUBTYPES`` setting on a per exception basis
 
 All other keyword arguments are passed directly to the handler
 function when there is an exception to handle.
@@ -269,7 +311,7 @@ with djexcept.
 #### ``djexcept.is_handled(exception_class)``
 
 Checks whether the given exception class is handled by djexcept.
-If ``DJEXCEPT_HANDLE_SUBCLASSES`` setting is disabled and not overwritten
+If ``DJEXCEPT_HANDLE_SUBTYPES`` setting is disabled and not overwritten
 at registration stage, this function returns the same result as
 ``djexcept.is_registered()``.
 
