@@ -127,19 +127,9 @@ arguments listed above and will create either a
 ``django.template.response.TemplateResponse``, depending on the setting
 for ``DJEXCEPT_INCLUDE_REQUEST``.
 
-It will populate the template context with some handy values regarding
-the raised exception:
-
--  ``exc``: the exception object
--  ``exc_name``: the name of the exception type (e.g.
-   ``PermissionDenied``)
--  ``exc_module``: the module name of the exception's type (e.g.
-   ``django.core.exceptions``)
--  ``exc_modname``: both concatenated, separated by a period (e.g.
-   ``django.core.exceptions.PermissionDenied``)
--  ``status``: the HTTP status code used
-
-You can use these variables freely in your template.
+It uses ``djexcept.util.populate_context()`` to populate the context
+with some handy values regarding the exception that you can use in your
+template. Please see the API reference for details about these values.
 
 Custom exception handlers
 ~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -209,6 +199,16 @@ following example:
 Using this example, raising either ``NegativeAccountBalance`` or
 ``OfferExpired`` will be handled as it was a ``BusinessRuleViolation``,
 what it in fact is.
+
+In your template, you could now introduce some conditional content:
+
+::
+
+    {% if exc_name == "NegativeAccountBalance" %}
+        ...
+    {% elif exc_name == "OfferExpired" %}
+        ...
+    {% endif %}
 
 In theory, you could even catch all possible sub-types of ``Exception``,
 however doing so is not recommended because it will hide potential bugs
@@ -334,8 +334,31 @@ Handlers
 
 This is djexcept's default exception handler.
 
+It uses ``djexcept.util.populate_context()`` to populate the context
+with some handy values regarding the exception that you can use in your
+template.
+
 A ``django.template.response.SimpleTemplateResponse`` or
 ``django.template.response.TemplateResponse`` is returned.
+
+Util
+~~~~
+
+``populate_context(context, exc, status=None)``
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Populates the given context dictionary with djexcept's handy default
+values. The dictionary is altered in-place, but values that are already
+present won't be overwritten.
+
+The following values are added to the context: \* ``exc``: the exception
+object \* ``exc_name``: the name of the exception type (e.g.
+``PermissionDenied`` or ``ValueError``) \* ``exc_module``: the module
+name of the exception's type (e.g. ``django.core.exceptions`` or
+``builtins``) \* ``exc_modname``: both concatenated, separated by a
+period (e.g. ``django.core.exceptions.PermissionDenied`` or
+``builtins.ValueError``) \* ``status``: the HTTP status code used (only
+added if not ``None``)
 
 Exceptions
 ~~~~~~~~~~
