@@ -10,12 +10,12 @@ error handlers for 4 different exceptions (``SuspiciousOperation``,
 errors which doesn't even get the exception passed to decide what to
 do best).
 
-That is where djexcept kicks in. For every type of exception you like -
+That is where djexcept hooks in. For every type of exception you like -
 even custom ones - it lets you decide how to handle it. It provides a
 default exception handler that makes additional information about the
 exception available in a template context and then renders a template
-of your choice. You can define the template to use, the HTTP status code
-to send and even change the exception handler on a per exception
+of your choice. You can define the template to use, the HTTP status
+code to send and even change the exception handler on a per exception
 basis. However, sensible defaults are provided for you to get up and
 running as quick as possible.
 
