@@ -15,14 +15,16 @@ even custom ones - it lets you decide how to handle it. It provides a
 default exception handler that makes additional information about the
 exception available in a template context and then renders a template
 of your choice. You can define the template to use, the HTTP status code
-to send and even choose the exception handler on a per exception basis
-or just use the defaults.
+to send and even change the exception handler on a per exception
+basis. However, sensible defaults are provided for you to get up and
+running as quick as possible.
 
 **Note:**
 djexcept is still a young pice of software that I use in my Django
 projects. There may be bugs I haven't found yet. However, the codebase
 is reasonably small without lots of magic in it, hence things shouldn't
-go terribly wrong. Any bug reports and code review are highly appreciated.
+go terribly wrong after all. Any bug reports and code review are highly
+appreciated.
 
 
 
@@ -43,6 +45,7 @@ is compatible with both the new ``MIDDLEWARE`` as well as the pre 1.10
 
 
 ## Getting started
+
 1. Add ``djexcept.middleware.ExceptionHandlingMiddleware`` to your
    ``MIDDLEWARE`` in ``settings.py``. No modification of
    ``INSTALLED_APPS`` is needed.
