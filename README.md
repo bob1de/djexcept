@@ -1,4 +1,4 @@
-# djexcept
+# ``djexcept``
 
 djexcept is a module that brings flexible exception handling to the
 Django web framework.
@@ -158,12 +158,22 @@ context of subsequent exceptions.
 
 ```
 import time
+import djexcept
 from djexcept.handlers import handle_exception
 
-def my_exception_handler(request, exc, context=None, **kwargs):
+def my_handler(request, exc, ctime=True, localtime=True, context=None, **kwargs):
     context = dict(context or {})
-    context.setdefault("time", time.ctime())
+    if localtime:
+        context.setdefault("localtime", time.localtime())
+    if ctime:
+        context.setdefault("ctime", time.ctime())
     return handle_exception(request, exc, context=context, **kwargs)
+
+# Use the handler like so:
+djexcept.register(SomeException, handler=my_handler)
+
+# or to include just ctime:
+djexcept.register(OtherException, handler=my_handler, localtime=False)
 ```
 
 
