@@ -4,10 +4,10 @@ from .config import config, load_exception_handler
 from .exceptions import RegistrationError
 
 
-_registered_exception_classes = {}
+_registered_exc_types = {}
 
 
-def register(exc_cls=None, **attrs):
+def register(exc_type=None, **attrs):
     """
     Registers the given Exception subclass for error handling with
     djexcept.
@@ -29,26 +29,26 @@ def register(exc_cls=None, **attrs):
     already registered.
     """
 
-    def register(exc_cls):
-        if not issubclass(exc_cls, Exception):
+    def register(exc_type):
+        if not issubclass(exc_type, Exception):
             raise RegistrationError(
-                    "{} is not a subclass of Exception".format(exc_cls))
-        if is_registered(exc_cls):
+                    "{} is not a subclass of Exception".format(exc_type))
+        if is_registered(exc_type):
             raise RegistrationError(
-                    "{} is already registered with djexcept.".format(exc_cls))
+                    "{} is already registered with djexcept".format(exc_type))
         if isinstance(attrs.get("handler"), str):
             # lazy-import the handler
             attrs["handler"] = load_exception_handler(attrs["handler"])
-        _registered_exception_classes[exc_cls] = attrs
-        return exc_cls
+        _registered_exc_types[exc_type] = attrs
+        return exc_type
 
     # Return a class decorator if class is not given
-    if exc_cls is None:
+    if exc_type is None:
         return register
     # Register the class
-    return register(exc_cls)
+    return register(exc_type)
 
-def unregister(exc_cls):
+def unregister(exc_type):
     """
     Unregisters the given exception class from djexcept.
 
@@ -56,20 +56,20 @@ def unregister(exc_cls):
     registered.
     """
     try:
-        del _registered_exception_classes[exc_cls]
+        del _registered_exc_types[exc_type]
     except KeyError:
         raise RegistrationError(
-                "{} is not registered with djexcept.".format(exc_cls))
+                "{} is not registered with djexcept".format(exc_type))
 
-def is_registered(exc_cls):
+def is_registered(exc_type):
     """
     Checks whether the given Exception subclass is registered for use
     with djexcept.
     """
 
-    return exc_cls in _registered_exception_classes
+    return exc_type in _registered_exc_types
 
-def is_handled(exc_cls):
+def is_handled(exc_type):
     """
     Checks whether the given exception class is handled by djexcept.
     If DJEXCEPT_HANDLE_SUBTYPES setting is disabled and not overwritten
@@ -77,38 +77,32 @@ def is_handled(exc_cls):
     djexcept.is_registered().
     """
 
-    for cls, attrs in _registered_exception_classes.items():
-        # require exact match if include_subclasses is disabled
-        if not attrs.get("handle_subtypes", config.handle_subtypes) \
-           and cls is not exc_cls:
-            continue
-        if issubclass(exc_cls, cls):
-            return True
-    return False
+    return _get_closest_registered_type(exc_type) is not None
 
 
-def _get_best_exception_class_match(exc_cls):
+def _get_closest_registered_type(exc_type):
     """
     Searches the closest registered ancestor of the given exception
     class and returns it or None, if none exists. handle_subtypes
     attributes are considered.
     """
 
-    mro = inspect.getmro(exc_cls)
-    best = None
-    for cls, attrs in _registered_exception_classes.items():
-        # require exact match if include_subclasses is disabled
-        if not attrs.get("handle_subtypes", config.handle_subtypes) and \
-           cls is not exc_cls:
-            continue
-        if cls in mro:
-            idx = mro.index(cls)
-            if best is None or idx < best_idx:
-                best = cls
-                best_idx = idx
-    return best
+    mro = inspect.getmro(exc_type)
 
-def _get_exception_handler_attrs(exc_cls, exact=False):
+    # filter registered types for those that occur in the mro;
+    # require exact match if handle_subtypes is disabled
+    types = filter(
+            lambda t:
+                t in mro \
+                and (t is exc_type \
+                     or _registered_exc_types[t] \
+                        .get("handle_subtypes", config.handle_subtypes)),
+            _registered_exc_types.keys())
+
+    # choose the closest ancestor of exc_type
+    return min(types, default=None, key=lambda t: mro.index(t))
+
+def _get_registered_type_attrs(exc_type, exact=False):
     """
     Return the attributes provided when the given class was registered
     or None, if it isn't registered at all.
@@ -119,7 +113,6 @@ def _get_exception_handler_attrs(exc_cls, exact=False):
     """
 
     if not exact:
-        exc_cls = _get_best_exception_class_match(exc_cls)
+        exc_type = _get_closest_registered_type(exc_type)
 
-    return _registered_exception_classes.get(exc_cls)
-
+    return _registered_exc_types.get(exc_type)

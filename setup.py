@@ -1,27 +1,27 @@
 #!/usr/bin/env python3
 
 import os
-
 from setuptools import setup
 
 from djexcept import __version__
 
 
-def read(fname):
-  return open(os.path.join(os.path.dirname(__file__), fname)).read()
+def read_file(fname):
+    return open(os.path.join(os.path.dirname(__file__), fname)).read()
 
 
 setup(
     name = "djexcept",
     version = __version__,
-    url = "https://github.com/efficiosoft/djexcept",
-    license = "GPL-3",
     description = "Flexible and versatile exception handling for django.",
-    long_description = read("README.rst"),
+    long_description = read_file("README.rst"),
+    url = "https://github.com/efficiosoft/djexcept",
     author = "Robert Schindler",
     author_email = "r.schindler@efficiosoft.com",
+    license = "GPL-3",
     packages = ["djexcept"],
     install_requires = ["django"],
+    zip_safe = False,
     classifiers = [
         'Development Status :: 5 - Production/Stable',
         'Framework :: Django',

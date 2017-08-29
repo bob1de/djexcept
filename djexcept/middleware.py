@@ -6,7 +6,7 @@ except ImportError:
     MiddlewareMixin = object
 
 from .config import config
-from .registration import _get_exception_handler_attrs
+from .registration import _get_registered_type_attrs
 
 
 class ExceptionHandlingMiddleware(MiddlewareMixin):
@@ -26,7 +26,7 @@ class ExceptionHandlingMiddleware(MiddlewareMixin):
         handler_kwargs.update(config.default_handler_kwargs)
 
         exc_cls = exc.__class__
-        handler_attrs = _get_exception_handler_attrs(exc_cls)
+        handler_attrs = _get_registered_type_attrs(exc_cls)
 
         if handler_attrs is None:
             # we don't handle this kind of exception, pass it through
