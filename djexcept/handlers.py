@@ -1,10 +1,21 @@
+try:
+    import typing as T
+except ImportError:
+    pass
+
 from django.template.response import SimpleTemplateResponse, TemplateResponse
 
 from .util import populate_context
 
 
-def handle_exception(request, exc, template_name=None, status=None,
-                     include_request=None, context=None):
+def handle_exception(
+        request,
+        exc,                   # type: Exception
+        template_name=None,    # type: T.Optional[str]
+        status=None,           # type: T.Optional[int]
+        include_request=None,  # type: T.Optional[bool]
+        context=None,          # type: T.Optional[T.Dict[T.Any, T.Any]]
+        ):  # type: (...) -> SimpleTemplateResponse
     """
     This is djexcept's default exception handler.
 

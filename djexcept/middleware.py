@@ -1,4 +1,10 @@
+try:
+    import typing as T
+except ImportError:
+    pass
+
 from django.conf import settings
+from django.http import HttpResponse
 try:
     from django.utils.deprecation import MiddlewareMixin
 except ImportError:
@@ -14,23 +20,25 @@ class ExceptionHandlingMiddleware(MiddlewareMixin):
     A Django middleware responsible for djexcept's exception handling.
     """
 
-    def __init__(self, *args, **kwargs):
-        super(ExceptionHandlingMiddleware, self).__init__(*args, **kwargs)
+    def process_exception(
+            self,
+            request,
+            exc,      # type: Exception
+            ):  # type: (...) -> T.Optional[HttpResponse]
 
-    def process_exception(self, request, exc):
         if settings.DEBUG and config.disable_on_debug:
             # don't do anything
-            return
+            return None
 
-        handler_kwargs = {}
+        handler_kwargs = {}  # type: T.Dict[str, T.Any]
         handler_kwargs.update(config.default_handler_kwargs)
 
-        exc_cls = exc.__class__
-        handler_attrs = _get_registered_type_attrs(exc_cls)
+        exc_type = exc.__class__
+        handler_attrs = _get_registered_type_attrs(exc_type)
 
         if handler_attrs is None:
             # we don't handle this kind of exception, pass it through
-            return
+            return None
 
         handler = handler_attrs.get("handler", config.default_handler)
         handler_kwargs.update(handler_attrs)

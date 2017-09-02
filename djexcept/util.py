@@ -1,4 +1,14 @@
-def populate_context(context, exc, status=None):
+try:
+    import typing as T
+except ImportError:
+    pass
+
+
+def populate_context(
+        context,      # type: T.Dict[str, T.Any]
+        exc,          # type: Exception
+        status=None,  # type: T.Optional[int]
+        ):  # type: (...) -> None
     """
     Populates the given context dictionary with djexcept's handy default
     values. The dictionary is altered in-place, but values that are
